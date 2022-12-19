@@ -17,6 +17,7 @@ void  (*codegen_end_eqn    )();
 char* (*codegen_begin_func )();
 char* (*codegen_end_func   )();
 char* (*codegen_show_symbol)();
+char* (*codegen_spprint    )();
 
 static Array *langinit=0;
 static List  *known=0;
@@ -129,4 +130,9 @@ void lang_end_func(char* (*fnc)())
 void lang_show_symbol(char* (*fnc)())
 {
    codegen_show_symbol = fnc;
+}
+
+void lang_spprint(char* (*fnc)())
+{
+   codegen_spprint = fnc;
 }

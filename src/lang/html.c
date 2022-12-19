@@ -13,6 +13,7 @@
 .. + Equation descriptions will be written
  *--------------------------------------------------------------------*/
 
+#include "../codegen.h"
 #include "../assoc.h"
 #include "../eqns.h"
 #include "../error.h"
@@ -729,6 +730,150 @@ char *HTML_show_symbol(char *str, List *setlist, Context context)
    return curstr;
 }
 
+/*-------------------------------------------------------------------*
+ *  HTML_spprint
+ *
+ *  Modifies the default spprint implementation to ensure
+ *-------------------------------------------------------------------*/
+char *HTML_spprint(Nodetype prevtype, Node *cur, char *indent)
+{
+
+   int parens, wrap_right;
+   char *comma, *cr;
+   char *lstr, *rstr, *chunk;
+
+   if (cur == 0)
+      return strdup("");
+
+   parens = 0;
+   comma = "";
+   switch (prevtype)
+   {
+   case nul:
+   case add:
+   case sub:
+      if (now(neg))
+         parens = 1;
+      break;
+
+   case mul:
+      if (now(add) || now(sub))
+         parens = 1;
+      if (now(dvd) || now(neg))
+         parens = 1;
+      break;
+
+   case neg:
+      parens = 1;
+      if (now(nam) || now(num) || now(mul))
+         parens = 0;
+      if (now(log) || now(exp) || now(pow))
+         parens = 0;
+      if (now(sum) || now(prd))
+         parens = 0;
+      break;
+
+   case dvd:
+      parens = 1;
+      if (now(nam) || now(num) || now(pow))
+         parens = 0;
+      if (now(sum) || now(prd))
+         parens = 0;
+      if (now(log) || now(exp))
+         parens = 0;
+      break;
+
+   case pow:
+      parens = 1;
+      if (now(nam) || now(num) || now(log) || now(exp))
+         parens = 0;
+      if (now(sum) || now(prd))
+         parens = 0;
+      break;
+
+   case log:
+   case exp:
+   case lag:
+   case led:
+      parens = 1;
+      break;
+
+   case equ:
+   case sum:
+   case prd:
+   case dom:
+      break;
+
+   case nam:
+   case num:
+      if (now(nam) || now(num))
+         comma = ",";
+      break;
+
+   default:
+      fatal_error("%s", "invalid state reached in spprint");
+   }
+
+   switch (cur->type)
+   {
+   case sum:
+   case prd:
+      lstr = codegen_spprint(cur->type, cur->l, indent);
+      rstr = codegen_spprint(cur->type, cur->r, indent);
+      chunk = concat(6, cur->str, "(", lstr, ",", rstr, ")");
+      free(lstr);
+      free(rstr);
+      break;
+
+   case lst:
+      lstr = strdup("{("); // GCS Added { for HTML LaTeX output
+      for (cur = cur->r; cur; cur = cur->r)
+      {
+         if (cur->r)
+            rstr = concat(3, lstr, cur->str, ",");
+         else
+            rstr = concat(2, lstr, cur->str);
+         free(lstr);
+         lstr = rstr;
+      }
+      chunk = concat(2, lstr, ")}"); // GCS Added } for HTML LaTeX output
+      free(lstr);
+      break;
+
+   default:
+      lstr = codegen_spprint(cur->type, cur->l, indent);
+      rstr = codegen_spprint(cur->type, cur->r, indent);
+
+      cr = "";
+      if (indent)
+         if (strlen(lstr) + strlen(rstr) > 70 || strlen(lstr) > 40 || strlen(rstr) > 40)
+            cr = concat(2, "\n", indent);
+
+      wrap_right = 0;
+      if (cur->type == sub)
+         if (cur->r->type == add || cur->r->type == sub)
+            wrap_right = 1;
+
+      if (parens)
+         // GCS Added {  to opening brackets for HTML LaTeX output
+         if (wrap_right)
+            chunk = concat(8, "{(", lstr, comma, cr, cur->str, "(", rstr, "))");
+         else
+            chunk = concat(7, "{(", lstr, comma, cr, cur->str, rstr, ")");
+      else if (wrap_right)
+         chunk = concat(7, lstr, comma, cr, cur->str, "(", rstr, ")");
+      else
+         chunk = concat(5, lstr, comma, cr, cur->str, rstr);
+
+      if (strlen(cr))
+         free(cr);
+      free(lstr);
+      free(rstr);
+   }
+
+   return chunk;
+}
+
 //----------------------------------------------------------------------//
 //  Connect up the public routines.
 //----------------------------------------------------------------------//
@@ -743,6 +888,7 @@ void Html_setup(void)
    lang_begin_func(HTML_begin_func);
    lang_end_func(HTML_end_func);
    lang_show_symbol(HTML_show_symbol);
+   lang_spprint(HTML_spprint);
 
    set_eqn_vector();
    set_sum_vector();

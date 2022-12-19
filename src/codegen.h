@@ -10,6 +10,7 @@ extern void  (*codegen_begin_file )();
 extern void  (*codegen_declare    )();
 extern void  (*codegen_end_eqn    )();
 extern void  (*codegen_end_file   )();
+extern char* (*codegen_spprint    )();
 
 void set_language(char *lang);
 

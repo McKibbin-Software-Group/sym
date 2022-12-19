@@ -47,6 +47,8 @@ void  freenode(Node*);
 #define isone(nde)	 ( nde && nde->type==num && strcmp(nde->str,"1")==0 )
 #define iszero(nde)	 ( nde && nde->type==num && strcmp(nde->str,"0")==0 )
 
+#define now(arg) (cur->type == arg)
+
 #include "spprint.h"
 
 #endif /* NODES_H */

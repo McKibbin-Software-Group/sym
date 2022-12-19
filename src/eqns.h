@@ -23,4 +23,13 @@ void  neweqn(Node*,Node*,Node*,Node*,Node*,Node*);
 void* firsteqn(void);
 void* nexteqn(void*);
 
+// Geoff Shuetrim December 2022.
+// Added these declarations to give better output control over equations.
+Node *getlhs(void *);
+Node *getrhs(void *);
+
+// Geoff Shuetrim December 2022.
+// Added this new function and its declaration so we could access the equation number.
+int eqnumber(void *);
+
 #endif /* EQNS_H */

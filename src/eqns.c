@@ -182,6 +182,21 @@ char *eqname(void *vcur)
 
 
 /*-------------------------------------------------------------------*
+ *  eqnumber
+ * Geoff Shuetrim December 2022.
+ * Added to provide access to the equation number.
+ * This is used in the HTML output generation
+ * and it may well also be used in the Python out 
+ * generation for msgproc.
+ *-------------------------------------------------------------------*/
+int eqnumber(void *vcur)
+{
+   validate(vcur, EQSIG, "eqnumber");
+   return ((Equation *)vcur)->n;
+}
+
+
+/*-------------------------------------------------------------------*
  *  eqnlabel
  *-------------------------------------------------------------------*/
 char *eqnlabel(void *vcur)

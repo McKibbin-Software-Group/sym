@@ -13,6 +13,25 @@ typedef enum
    } 
    Symboltype;
 
+struct symbol
+{
+   int obj;
+   char *str;
+   Symboltype type;
+   char *desc;
+   List *value;
+   List *attr;
+   int size;
+   int used;
+   List *leqns;
+   List *reqns;
+   struct symbol *next;
+};
+
+typedef struct symbol Symbol;
+
+Symbol st_head;
+
 //
 //  Function prototypes
 //

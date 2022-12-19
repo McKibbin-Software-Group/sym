@@ -183,6 +183,7 @@ char *eqname(void *vcur)
 
 /*-------------------------------------------------------------------*
  *  eqnumber
+ *
  * Geoff Shuetrim December 2022.
  * Added to provide access to the equation number.
  * This is used in the HTML output generation
@@ -268,6 +269,8 @@ static int node_lvalue(Node *cur)
       case lag:
       case led: 
          return node_lvalue( cur->r );
+      default:
+         break;
       }
    return 0;
 }
@@ -1107,10 +1110,16 @@ void check_equations()
          }
          
       if( eq->min_dt || eq->max_dt )
-         if( eq->min_dt == NOTSET )
-            error_front("Equation %d contains no variables or parameters",n);
-         else
-            fprintf(info,"Relative Time: [%d,%d]\n",eq->min_dt,eq->max_dt);
+         {
+            if (eq->min_dt == NOTSET)
+               {
+                  error_front("Equation %d contains no variables or parameters", n);
+               }
+            else 
+               {
+                  fprintf(info, "Relative Time: [%d,%d]\n", eq->min_dt, eq->max_dt);
+               }
+         }
 
       if( eq->attr->n )
          fprintf(info,"Attributes: %s\n",slprint(eq->attr));

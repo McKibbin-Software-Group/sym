@@ -28,22 +28,22 @@
 
 #define NOSIZE -1
 
-struct symbol
-   {
-   int  obj;
-   char *str;
-   Symboltype type;
-   char *desc;
-   List *value;
-   List *attr;
-   int  size;
-   int  used;
-   List *leqns;
-   List *reqns;
-   struct symbol *next;
-   };
+// struct symbol
+//    {
+//    int  obj;
+//    char *str;
+//    Symboltype type;
+//    char *desc;
+//    List *value;
+//    List *attr;
+//    int  size;
+//    int  used;
+//    List *leqns;
+//    List *reqns;
+//    struct symbol *next;
+//    };
 
-typedef struct symbol Symbol;
+// typedef struct symbol Symbol;
 
 Symbol st_head;
 int st_init=0;
@@ -188,7 +188,7 @@ void *nextsymbol(void *cur)
    sym = (Symbol *) cur;
    type = sym->type;
 
-   while( sym=sym->next )
+   while ((sym = sym->next))
       if( type==sym->type )return sym ;
 
    return 0;

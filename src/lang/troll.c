@@ -117,8 +117,8 @@ int Troll_namelist(void *sym)
    obuf = strdup("");
    
    cart_build(sets);
-   while( subs=cart_next() )
-      {
+   while ((subs = cart_next()))
+   {
       full = Troll_namegen(base,subs);
       if( strlen(obuf)==0 )
          {

@@ -209,8 +209,8 @@ static void oxgs_declcode(Variable *v)
    cart_build(setlist);
    freelist(setlist);
 
-   while( cur=cart_next() )
-      {
+   while ((cur = cart_next()))
+   {
       fullname = oxgs_mkname(v->str,cur);
       fprintf(incfile, "decl %s;%s\n",fullname,msg);
       if( cur->n == 0 )
@@ -328,8 +328,8 @@ void OxGS_declare(void *sym)
 
       cart_build( newvar->sets );
 
-      while( cart=cart_next() )
-         {
+      while ((cart = cart_next()))
+      {
          newendo  = (Endogenous *) malloc( sizeof(Endogenous) );
          newendo->obj  = MYEND;
          newendo->str  = oxgs_mkname(name,cart);

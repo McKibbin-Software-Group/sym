@@ -965,7 +965,7 @@ void PYTHON_declare(void *sym)
 
    attlist = symattrib(sym);
 
-   for (i = 0; curtype = vlist[i].type; i++)
+   for (i = 0; (curtype = vlist[i].type); i++)
    {
       if (*curtype == 0)
          FAULT("Corrupted vlist in Python_declare");

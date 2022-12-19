@@ -267,7 +267,7 @@ List *list;
    
    for( cur=list->first ; cur ; cur=cur->next )
       if( 0 == n++ )
-         printf(cur->str);
+         printf("%s", cur->str);
       else
          printf(",%s",cur->str);
 

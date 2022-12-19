@@ -61,5 +61,5 @@ Support GEMPACK's TABLO language.\n\
 Support TROLL.\n\
 \n\
 \n"};
-printf(from_lang);
+printf("%s",from_lang);
 }

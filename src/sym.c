@@ -108,8 +108,7 @@ void parse_command(int, char *[]);
 int isoption(char *, int);
 static char *builtby();
 
-void main(argc, argv) int argc;
-char *argv[];
+int main(int argc, char *argv[])
 {
    void listsymbols();
    char *argument();
@@ -233,7 +232,7 @@ char *argv[];
    codefile = argument(1);
 
    basename = strdup(codefile);
-   if (ext = strrchr(basename, '.'))
+   if ((ext = strrchr(basename, '.')))
       *ext = '\0';
    listfile = concat(2, basename, ".lis");
 

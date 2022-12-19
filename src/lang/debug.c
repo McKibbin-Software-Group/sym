@@ -263,16 +263,22 @@ void DB_declare(void *sym)
    //  write out scalar declarations if needed
    //
 
-   if( do_scalars ) 
+   if( do_scalars )
+      {
       if( istype(sym,par) || istype(sym,var) )
-         if( valu->n == 0 )
-            saw_scalar(name,0,sca_dec);
+         {
+         if (valu->n == 0)
+            {
+            saw_scalar(name, 0, sca_dec);
+            }
          else
             {
             cart_build(valu);
-            while( cur=cart_next() )
-               saw_scalar(name,cur,sca_dec);
+            while ((cur = cart_next()))
+               saw_scalar(name, cur, sca_dec);
             }
+         }
+      }
 
    free(name);
    free(desc);
@@ -361,10 +367,16 @@ char *DB_show_symbol(char *str, List *sublist, Context context)
    sop = context.lhs ? sca_lhs : sca_rhs ;
 
    if( do_scalars )
+      {
       if( sublist->n == 0 ) 
-         saw_scalar(str,0,sop);
-      else
-         saw_scalar(str,sublist,sop);
+         {
+            saw_scalar(str, 0, sop);
+         }
+      else 
+         {
+            saw_scalar(str, sublist, sop);
+         }
+      }
 
    return ptr;
 }

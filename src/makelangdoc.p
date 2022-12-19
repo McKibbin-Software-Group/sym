@@ -30,7 +30,7 @@ foreach $src ( @inp ) {
 }
 
 print OUT "\\n\"};\n";
-print OUT "printf(from_lang);\n";
+print OUT "printf(\"%s\",from_lang);\n";
 print OUT "}\n";
 
 close OUT;

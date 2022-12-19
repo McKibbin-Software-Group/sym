@@ -99,15 +99,19 @@ lang/%.o : lang/%.c
    
 #	$(CC) $(OPT) -c $< -o $*.$(OBJ)
 
-all : ../docs/usage.md ../docs/syntax.md
+#all : ../docs/usage.md ../docs/syntax.md
+#
+#../docs/syntax.md : $(EXE)#
+#	-rm -f $@
+#	$(EXE) -syntax > $@
+#
+#../docs/usage.md : $(EXE)
+#	-rm -f $@
+#	$(EXE) -doc > $@
+#
+#
 
-../docs/syntax.md : $(EXE)
-	-rm -f $@
-	$(EXE) -syntax > $@
-
-../docs/usage.md : $(EXE)
-	-rm -f $@
-	$(EXE) -doc > $@
+all: $(EXE)
 
 langdoc.c : $(LANGS)
 	perl makelangdoc.p

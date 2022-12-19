@@ -280,10 +280,10 @@ void write_file(char *basename)
          int neqns;
          neqns = eqncount(eq);
          cart_build(eqsets);
-         while( sublist=cart_next() )
-            {
-            show_eq(eq,eqsets,sublist);
-            neqns--;
+         while ((sublist = cart_next()))
+         {
+               show_eq(eq, eqsets, sublist);
+               neqns--;
             }
          if( neqns )
             FAULT("Incorrect number of equations written. Using # with a time set?");
@@ -325,7 +325,7 @@ void wrap_write(char *line, int addcr, int commaok)
       
       if( strlen(rest) <= linelength )
          {
-         fprintf(code,rest);
+         fprintf(code, "%s", rest);
          if( addcr )fprintf(code,"\n");
          return;
          }
@@ -391,18 +391,18 @@ void show_eq(void *eq, List *setlist, List *sublist)
 
    if( linelength==0 )
       {
-      fprintf(code,all);
+      fprintf(code, "%s", all);
       free(all);
       codegen_end_eqn(eq);
       return;
       }
       
    if( strlen(all) <= linelength )
-      fprintf(code,all);
+      fprintf(code, "%s", all);
    else
       {
-      for( head=all ; tail=strchr(head,'\n') ; head=tail )
-         {
+      for (head = all; (tail = strchr(head, '\n')); head = tail)
+      {
          *tail++ = '\0';
          wrap_write(head,1,0);
          }
@@ -539,6 +539,9 @@ List *setlist,*sublist;
 
       case lst:
          FAULT("Unexpected lst state in show_node");
+   
+      default:
+         break;
       }
 
    //

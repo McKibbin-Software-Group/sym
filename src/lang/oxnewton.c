@@ -138,8 +138,8 @@ void oxn_declcode(Variable *v)
    cart_build(setlist);
    freelist(setlist);
 
-   while( cur=cart_next() )
-      {
+   while ((cur = cart_next()))
+   {
       fullname = oxn_mkname(v->str,cur);
       fprintf(incfile,"   decl %s;%s\n",fullname,msg);
       fprintf(initfile,"   %s = getval(\"%s(%s)\") ; \n",fullname,v->str,slprint(cur));

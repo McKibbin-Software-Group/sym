@@ -61,6 +61,74 @@ div.eqn { margin-top: 1em; margin-left: 2em;} \
 ";
 
 //----------------------------------------------------------------------//
+//  html equation LHS and RHS printing.
+//
+// Geoff Shuetrim (GCS) addition in December 2022.
+// Supports HTML printing of equations.
+// Should be in the html.c file perhaps...?
+//----------------------------------------------------------------------//
+char *html_slprint_for_eqnlist(List *list)
+{
+   char *obuf;
+   Item *cur;
+   int n, size;
+   char *anchorTag;
+
+   if (list->obj != LISTOBJ)
+      fatal_error("%s", "argument to html_slprint is not a list");
+
+   if (list->n == 0)
+      return "none";
+
+   size = 0;
+
+   for (n = 0, cur = list->first; cur; cur = cur->next)
+   {
+      if (size)
+         size += 2;
+      size += 2 * strlen(cur->str) + 19;
+   }
+
+   obuf = (char *)xmalloc(size + 1);
+
+   n = 0;
+   for (n = 0, cur = list->first; cur; cur = cur->next)
+      if (0 == n++)
+      {
+         anchorTag = concat(5, "<a href='#", cur->str, "'>", cur->str, "</a>");
+         strcpy(obuf, anchorTag);
+      }
+      else
+      {
+         strcat(obuf, ", ");
+         anchorTag = concat(5, "<a href='#", cur->str, "'>", cur->str, "</a>");
+         strcat(obuf, anchorTag);
+      }
+
+   return obuf;
+}
+
+char *lhsAsHtml(void *sym)
+{
+   if (sym == 0)
+      return 0;
+   validate(sym, SYMBOBJ, "symdef");
+   if (((Symbol *)sym)->leqns->n == 0)
+      return "none";
+   return html_slprint_for_eqnlist(((Symbol *)sym)->leqns);
+}
+
+char *rhsAsHtml(void *sym)
+{
+   if (sym == 0)
+      return 0;
+   validate(sym, SYMBOBJ, "symdef");
+   if (((Symbol *)sym)->reqns->n == 0)
+      return "none";
+   return html_slprint_for_eqnlist(((Symbol *)sym)->reqns);
+}
+
+//----------------------------------------------------------------------//
 //  html_slprint
 //
 //  Generate a comma-separated string from a list.  Almost identical
@@ -196,7 +264,7 @@ char *str_replace(char *orig, char *rep, char *with)
 
    // count the number of replacements needed
    ins = orig;
-   for (count = 0; tmp = strstr(ins, rep); ++count)
+   for (count = 0; (tmp = strstr(ins, rep)); ++count)
    {
       ins = tmp + len_rep;
    }
@@ -527,70 +595,6 @@ char *getLhsVariableName(Node *node)
    return "Not a variable";
 }
 
-// Geoff Shuetrim (GCS) addition in December 2022.
-// Supports HTML printing of equations.
-// Should be in the html.c file perhaps...?
-char *html_slprint_for_eqnlist(list)
-List *list;
-{
-   char *obuf;
-   Item *cur;
-   int n, size;
-   char *anchorTag;
-
-   if (list->obj != LISTOBJ)
-      fatal_error("%s", "argument to html_slprint is not a list");
-
-   if (list->n == 0)
-      return "none";
-
-   size = 0;
-
-   for (n = 0, cur = list->first; cur; cur = cur->next)
-   {
-      if (size)
-         size += 2;
-      size += 2 * strlen(cur->str) + 19;
-   }
-
-   obuf = (char *)xmalloc(size + 1);
-
-   n = 0;
-   for (n = 0, cur = list->first; cur; cur = cur->next)
-      if (0 == n++)
-      {
-         anchorTag = concat(5, "<a href='#", cur->str, "'>", cur->str, "</a>");
-         strcpy(obuf, anchorTag);
-      }
-      else
-      {
-         strcat(obuf, ", ");
-         anchorTag = concat(5, "<a href='#", cur->str, "'>", cur->str, "</a>");
-         strcat(obuf, anchorTag);
-      }
-
-   return obuf;
-}
-
-char *lhsAsHtml(void *sym)
-{
-   if (sym == 0)
-      return 0;
-   validate(sym, SYMBOBJ, "symdef");
-   if (((Symbol *)sym)->leqns->n == 0)
-      return "none";
-   return html_slprint_for_eqnlist(((Symbol *)sym)->leqns);
-}
-
-char *rhsAsHtml(void *sym)
-{
-   if (sym == 0)
-      return 0;
-   validate(sym, SYMBOBJ, "symdef");
-   if (((Symbol *)sym)->reqns->n == 0)
-      return "none";
-   return html_slprint_for_eqnlist(((Symbol *)sym)->reqns);
-}
 
 //----------------------------------------------------------------------//
 //  HTML_begin_block

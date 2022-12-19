@@ -312,6 +312,7 @@ char *tablo_filename(enum har_type har)
       case h_par: filename = "param"   ; break ;
       case h_ext: filename = "extra"   ; break ;
       case h_exo: filename = "exog"    ; break ;
+      default: break;
       }
 
    return filename;

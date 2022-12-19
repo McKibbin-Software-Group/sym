@@ -378,8 +378,8 @@ static void OxGST_declcode(Variable *v)
    //
 
    lastname = strdup("");
-   while( cur=cart_next() )
-      {
+   while ((cur = cart_next()))
+   {
 
       //
       //  create the OxGST variable name
@@ -550,8 +550,8 @@ void OxGST_declare(void *sym)
 
       cart_build( newvar->sets );
 
-      while( cart=cart_next() )
-         {
+      while ((cart = cart_next()))
+      {
          newendo  = (Endogenous *) malloc( sizeof(Endogenous) );
          newendo->obj  = MYEND;
          newendo->str  = OxGST_mkname(name,cart);
@@ -723,7 +723,7 @@ void OxGST_begin_file(char *basename)
    fprintf(code,"//\n");
    fprintf(code,"\n");
    fprintf(code,"#include \"gauss-seidel-gst.ox\"\n");
-   fprintf(code,"#include \"simple-csv.ox\"\n",basename);
+   fprintf(code,"#include \"simple-csv.ox\"\n");// GCS ,basename);
    fprintf(code,"#include \"%s\"\n",fname_decl);
    fprintf(code,"#include \"%s\"\n",fname_init);
    fprintf(code,"\n");

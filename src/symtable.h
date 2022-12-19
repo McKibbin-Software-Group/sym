@@ -30,7 +30,6 @@ struct symbol
 
 typedef struct symbol Symbol;
 
-Symbol st_head;
 
 //
 //  Function prototypes

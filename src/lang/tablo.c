@@ -33,6 +33,7 @@
 #include "../str.h"
 #include "../sym.h"
 #include "../symtable.h"
+#include "../codegen.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -396,7 +397,7 @@ static void Tablo_writedecs()
 
          iqual = cts->istime ? "(intertemporal) " : "" ;
          stmt  = concat(6,"set ",iqual,name," (",slprint(val),") ;");
-         wrap_write(stmt,1,1);
+         codegen_wrap_write(stmt,1,1);
          free(stmt);
 
          freelist(val);
@@ -440,7 +441,7 @@ static void Tablo_writedecs()
          ref  = tablovar(name,val,0);
 
          stmt = concat(4,"coefficient ",qual,ref," ;");
-         wrap_write(stmt,1,0);
+         codegen_wrap_write(stmt, 1, 0);
          free(stmt);
 
          freelist(val);
@@ -474,7 +475,7 @@ static void Tablo_writedecs()
             sprintf(buf,"H%3.3d",hdr++);
 
          stmt = concat(7,"read ",qual,"\n   ",ref," from file param header \"",buf,"\" ;");
-         wrap_write(stmt,1,0);
+         codegen_wrap_write(stmt, 1, 0);
          free(stmt);
 
          free(name);
@@ -503,7 +504,7 @@ static void Tablo_writedecs()
          else
             stmt = concat(4,"coefficient ",qual,ref," ;");
 
-         wrap_write(stmt,1,0);
+         codegen_wrap_write(stmt, 1, 0);
          free(stmt);
 
          filename = tablo_filename(tablo_type(cur));
@@ -545,7 +546,7 @@ static void Tablo_writedecs()
          strncpy(buf,atts->first->str,10);
 
          stmt = concat(9,"read ",qual,"\n   ",ref," from file ",filename," header \"",buf,"\" ;");
-         wrap_write(stmt,1,0);
+         codegen_wrap_write(stmt, 1, 0);
          free(stmt);
 
          free(name);
@@ -640,7 +641,7 @@ void Tablo_end_file()
             {
             strncpy(buf,atts->first->str,10);
             stmt = concat(7,"write ",qual,"\n   ",ref," to file calc header \"",buf,"\" ;\n");
-            wrap_write(stmt,1,0);
+            codegen_wrap_write(stmt, 1, 0);
             free(stmt);
             }
          }

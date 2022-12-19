@@ -38,10 +38,8 @@ static int linelength=0;
 //  structures for holding information about the current equation
 //
 
-static void  show_eq(void*, List*, List* );
-static char* show_node(Nodetype, Node*, List*, List* );
-static char* show_symbol( char*, List*, List*, List*, Context );
-
+// static void  show_eq(void*, List*, List* );
+// static char* show_node(Nodetype, Node*, List*, List* );
 
 /*--------------------------------------------------------------------*
  *  show_symbol
@@ -96,10 +94,7 @@ static char* show_symbol( char*, List*, List*, List*, Context );
  *  The finished list of subscripts for this symbol is stored in vsubs.
  *
  *--------------------------------------------------------------------*/
-static char *show_symbol(name,vsets,esets,esubs,context)
-char *name;
-List *vsets,*esets,*esubs;
-Context context;
+ char *show_symbol(char *name,List *vsets,List *esets,List *esubs,Context context)
 {
    void *sym;
    List *vsubs;
@@ -191,119 +186,119 @@ Context context;
  *  Write out a file in the selected language.  This is the only
  *  public method in the file.
  *--------------------------------------------------------------------*/
-void write_file(char *basename)
-{
-   void *sym;
-   void *eq;
-   List *eqnsets(),*eqsets;
-   int eqncount();
+// void write_file(char *basename)
+// {
+//    void *sym;
+//    void *eq;
+//    List *eqnsets(),*eqsets;
+//    int eqncount();
 
-   if( DBG )
-      printf("write_file\n");
+//    if( DBG )
+//       printf("write_file\n");
 
-   //  
-   //  Retrieve options relevant to file format
-   //
+//    //  
+//    //  Retrieve options relevant to file format
+//    //
 
-   linelength = get_line_length();
+//    linelength = get_line_length();
 
-   //
-   //  Allow the language module to set options and write 
-   //  any introductory information to the output file.
-   //
+//    //
+//    //  Allow the language module to set options and write 
+//    //  any introductory information to the output file.
+//    //
    
-   codegen_begin_file(basename);
-   if( DBG )xcheck("after begin_file");
+//    codegen_begin_file(basename);
+//    if( DBG )xcheck("after begin_file");
 
-   //
-   //  Some options do not have defaults and MUST be set 
-   //  by the language module.
-   //
+//    //
+//    //  Some options do not have defaults and MUST be set 
+//    //  by the language module.
+//    //
    
-   if( is_eqn_set()==0 )
-      FAULT("Equation style has not been set");
-   if( is_sum_set()==0 )
-      FAULT("Summation style has not been set");
+//    if( is_eqn_set()==0 )
+//       FAULT("Equation style has not been set");
+//    if( is_sum_set()==0 )
+//       FAULT("Summation style has not been set");
 
-   if( DBG )
-      {
-      printf("   eqn style: ");
-         printf("scalar=%d ",is_eqn_scalar());
-         printf("vector=%d\n",is_eqn_vector());
-      printf("   sum style: ");
-         printf("scalar=%d ",is_sum_scalar());
-         printf("vector=%d\n",is_sum_vector());
-      }
+//    if( DBG )
+//       {
+//       printf("   eqn style: ");
+//          printf("scalar=%d ",is_eqn_scalar());
+//          printf("vector=%d\n",is_eqn_vector());
+//       printf("   sum style: ");
+//          printf("scalar=%d ",is_sum_scalar());
+//          printf("vector=%d\n",is_sum_vector());
+//       }
       
-   // 
-   //  Tell the language module about the symbols.  Pass it 
-   //  all the sets first, then the parameters, and then the 
-   //  variables.  
-   //
+//    // 
+//    //  Tell the language module about the symbols.  Pass it 
+//    //  all the sets first, then the parameters, and then the 
+//    //  variables.  
+//    //
    
-   for( sym=firstsymbol(set); sym ; sym=nextsymbol(sym) )
-      codegen_declare(sym);
+//    for( sym=firstsymbol(set); sym ; sym=nextsymbol(sym) )
+//       codegen_declare(sym);
 
-   for( sym=firstsymbol(par); sym ; sym=nextsymbol(sym) )
-      codegen_declare(sym);
+//    for( sym=firstsymbol(par); sym ; sym=nextsymbol(sym) )
+//       codegen_declare(sym);
 
-   for( sym=firstsymbol(var); sym ; sym=nextsymbol(sym) )
-      codegen_declare(sym);
+//    for( sym=firstsymbol(var); sym ; sym=nextsymbol(sym) )
+//       codegen_declare(sym);
 
-   if( DBG )xcheck("after declares");
+//    if( DBG )xcheck("after declares");
    
-   //
-   //  Now generate the equations.  The language module is 
-   //  allowed to write a preamble to each equation block, and 
-   //  to write a prefix and suffix to each equation, but the 
-   //  the main equation-writing is done by by show_eq.  
-   //
+//    //
+//    //  Now generate the equations.  The language module is 
+//    //  allowed to write a preamble to each equation block, and 
+//    //  to write a prefix and suffix to each equation, but the 
+//    //  the main equation-writing is done by by show_eq.  
+//    //
 
-   for( eq = firsteqn() ; eq ; eq=nexteqn(eq) )
-      {
-      List *sublist;
+//    for( eq = firsteqn() ; eq ; eq=nexteqn(eq) )
+//       {
+//       List *sublist;
 
-      if( hasundec(eq) || ! istimeok(eq) )continue;
+//       if( hasundec(eq) || ! istimeok(eq) )continue;
       
-      eqsets = eqnsets(eq);
+//       eqsets = eqnsets(eq);
       
-      codegen_begin_block(eq);
+//       codegen_begin_block(eq);
       
-      if( is_eqn_vector() )
-         {
-         sublist = newsequence();
-         show_eq(eq,eqsets,sublist);
-         freelist(sublist);
-         }
-      else
-         {
-         int neqns;
-         neqns = eqncount(eq);
-         cart_build(eqsets);
-         while ((sublist = cart_next()))
-         {
-               show_eq(eq, eqsets, sublist);
-               neqns--;
-            }
-         if( neqns )
-            FAULT("Incorrect number of equations written. Using # with a time set?");
-         }
+//       if( is_eqn_vector() )
+//          {
+//          sublist = newsequence();
+//          show_eq(eq,eqsets,sublist);
+//          freelist(sublist);
+//          }
+//       else
+//          {
+//          int neqns;
+//          neqns = eqncount(eq);
+//          cart_build(eqsets);
+//          while ((sublist = cart_next()))
+//          {
+//                show_eq(eq, eqsets, sublist);
+//                neqns--;
+//             }
+//          if( neqns )
+//             FAULT("Incorrect number of equations written. Using # with a time set?");
+//          }
          
-      eqsets = freelist(eqsets);
-      }
+//       eqsets = freelist(eqsets);
+//       }
 
-   if( DBG )xcheck("after equations");
+//    if( DBG )xcheck("after equations");
    
-   //
-   //  All done; allow the language module to write a postscript
-   //
+//    //
+//    //  All done; allow the language module to write a postscript
+//    //
 
-   codegen_end_file();
-   if( DBG )xcheck("after end_file");
+//    codegen_end_file();
+//    if( DBG )xcheck("after end_file");
 
-   fclose(code);
-   fclose(info);
-}
+//    fclose(code);
+//    fclose(info);
+// }
 
 
 /*--------------------------------------------------------------------*
@@ -312,56 +307,56 @@ void write_file(char *basename)
  *  write a line to the code file but wrap it to keep the line from
  *  being too long.
  *--------------------------------------------------------------------*/
-void wrap_write(char *line, int addcr, int commaok)
-{
-   char *end,op,*dup,*rest;
-   int do_wrap;
+// void wrap_write(char *line, int addcr, int commaok)
+// {
+//    char *end,op,*dup,*rest;
+//    int do_wrap;
 
-   dup  = strdup(line);
-   rest = dup;
+//    dup  = strdup(line);
+//    rest = dup;
    
-   while( rest )
-      {
+//    while( rest )
+//       {
       
-      if( strlen(rest) <= linelength )
-         {
-         fprintf(code, "%s", rest);
-         if( addcr )fprintf(code,"\n");
-         return;
-         }
+//       if( strlen(rest) <= linelength )
+//          {
+//          fprintf(code, "%s", rest);
+//          if( addcr )fprintf(code,"\n");
+//          return;
+//          }
 
-      if( strcspn(rest,"\n") <= linelength )
-         {
-         end = strchr(rest,'\n');
-         *end++ = '\0';
-         fprintf(code,"%s\n",rest);
-         rest = end;
-         continue;
-         }
+//       if( strcspn(rest,"\n") <= linelength )
+//          {
+//          end = strchr(rest,'\n');
+//          *end++ = '\0';
+//          fprintf(code,"%s\n",rest);
+//          rest = end;
+//          continue;
+//          }
          
-      for( end=rest+linelength ; end > rest ; end-- ) 
-         {
-         do_wrap = isspace(*end);
-         do_wrap |= (*end=='+' || *end=='-' || *end=='*' || *end=='/' || *end=='=' || *end=='^');
-         do_wrap |= (commaok && *end==',');
-         if( do_wrap )
-            {
-            op   = *end;
-            *end = '\0';
-            fprintf(code,"%s\n   ",rest);
-            *end = op;
-            break;
-            }            
-         }
+//       for( end=rest+linelength ; end > rest ; end-- ) 
+//          {
+//          do_wrap = isspace(*end);
+//          do_wrap |= (*end=='+' || *end=='-' || *end=='*' || *end=='/' || *end=='=' || *end=='^');
+//          do_wrap |= (commaok && *end==',');
+//          if( do_wrap )
+//             {
+//             op   = *end;
+//             *end = '\0';
+//             fprintf(code,"%s\n   ",rest);
+//             *end = op;
+//             break;
+//             }            
+//          }
 
-      if( rest == end )
-         fatal_error("Could not wrap long line:\n%s\n",line);
+//       if( rest == end )
+//          fatal_error("Could not wrap long line:\n%s\n",line);
 
-      rest = end;
-      }
+//       rest = end;
+//       }
 
-   free(dup);
-}
+//    free(dup);
+// }
 
 
 /*--------------------------------------------------------------------*
@@ -370,48 +365,48 @@ void wrap_write(char *line, int addcr, int commaok)
  *  Generate and print a scalar equation by recursively descending 
  *  through the node tree.
  *--------------------------------------------------------------------*/
-void show_eq(void *eq, List *setlist, List *sublist)
-{
-   Node *getlhs(),*getrhs();
-   char *lstr,*rstr,*all;
-   char *head,*tail;
+// void show_eq(void *eq, List *setlist, List *sublist)
+// {
+//    Node *getlhs(),*getrhs();
+//    char *lstr,*rstr,*all;
+//    char *head,*tail;
    
-   lstr = show_node(nul,getlhs(eq),setlist,sublist);
-   rstr = show_node(nul,getrhs(eq),setlist,sublist);
+//    lstr = show_node(nul,getlhs(eq),setlist,sublist);
+//    rstr = show_node(nul,getrhs(eq),setlist,sublist);
 
-   codegen_begin_eqn(eq);
+//    codegen_begin_eqn(eq);
 
-   if( is_eqn_normalized() )
-      all = concat(4,lstr," - (",rstr,")");
-   else
-      all = concat(3,lstr," = ",rstr);
+//    if( is_eqn_normalized() )
+//       all = concat(4,lstr," - (",rstr,")");
+//    else
+//       all = concat(3,lstr," = ",rstr);
 
-   free(lstr);
-   free(rstr);
+//    free(lstr);
+//    free(rstr);
 
-   if( linelength==0 )
-      {
-      fprintf(code, "%s", all);
-      free(all);
-      codegen_end_eqn(eq);
-      return;
-      }
+//    if( linelength==0 )
+//       {
+//       fprintf(code, "%s", all);
+//       free(all);
+//       codegen_end_eqn(eq);
+//       return;
+//       }
       
-   if( strlen(all) <= linelength )
-      fprintf(code, "%s", all);
-   else
-      {
-      for (head = all; (tail = strchr(head, '\n')); head = tail)
-      {
-         *tail++ = '\0';
-         wrap_write(head,1,0);
-         }
-      wrap_write(head,0,0);
-      }
+//    if( strlen(all) <= linelength )
+//       fprintf(code, "%s", all);
+//    else
+//       {
+//       for (head = all; (tail = strchr(head, '\n')); head = tail)
+//       {
+//          *tail++ = '\0';
+//          wrap_write(head,1,0);
+//          }
+//       wrap_write(head,0,0);
+//       }
       
-   free(all);
-   codegen_end_eqn(eq);
-}
+//    free(all);
+//    codegen_end_eqn(eq);
+// }
 
 
 /*--------------------------------------------------------------------*
@@ -422,276 +417,273 @@ void show_eq(void *eq, List *setlist, List *sublist)
  *  bottom up.  Avoids having any fixed buffer sizes but is a 
  *  bit tedious as a result.
  *--------------------------------------------------------------------*/
-static char *show_node(prevtype,cur,setlist,sublist)
-Nodetype prevtype;
-Node *cur;
-List *setlist,*sublist;
-{
-   int parens,wrap_right;
-   char *buf,*newbuf;
-   List *augsets,*augsubs,*sumover;
-   char *beginfunc,*endfunc;
-   char *lstr,*rstr,*cr;
-   char *lpar,*rpar;
-   char *op,*thisop;
-   int isfunc;
-   char *side;
-   Context mycontext;
+// static char *show_node(Nodetype prevtype,Node *cur,List *setlist,List *sublist)
+// {
+//    int parens,wrap_right;
+//    char *buf,*newbuf;
+//    List *augsets,*augsubs,*sumover;
+//    char *beginfunc,*endfunc;
+//    char *lstr,*rstr,*cr;
+//    char *lpar,*rpar;
+//    char *op,*thisop;
+//    int isfunc;
+//    char *side;
+//    Context mycontext;
 
-   if( cur==0 )return strdup("");
+//    if( cur==0 )return strdup("");
 
-   mycontext.lhs  = cur->lhs;
-   mycontext.dt   = cur->dt;
-   mycontext.tsub = 0;
+//    mycontext.lhs  = cur->lhs;
+//    mycontext.dt   = cur->dt;
+//    mycontext.tsub = 0;
 
-   side = mycontext.lhs ? "lhs" : "rhs" ;
-   if( DBG )printf("show_node (%s)\n",side);
+//    side = mycontext.lhs ? "lhs" : "rhs" ;
+//    if( DBG )printf("show_node (%s)\n",side);
    
-   validate( cur,     NODEOBJ, "show_node"              );
-   validate( setlist, LISTOBJ, "show_block for setlist" );
-   validate( sublist, LISTOBJ, "show_block for sublist" );
+//    validate( cur,     NODEOBJ, "show_node"              );
+//    validate( setlist, LISTOBJ, "show_block for setlist" );
+//    validate( sublist, LISTOBJ, "show_block for sublist" );
 
-#define now(arg) (cur->type == arg)
+// #define now(arg) (cur->type == arg)
 
-   //
-   //  decide whether the current node should be wrapped with
-   //  parentheses.  in principle this shouldn't be necessary
-   //  if all software correctly obeyed precedence rules but
-   //  we'll do it just out of paranoia (and experience with
-   //  gauss).
-   //
-   //  the choice is determined by the type of the node one
-   //  step higher in the parse tree.
-   //
+//    //
+//    //  decide whether the current node should be wrapped with
+//    //  parentheses.  in principle this shouldn't be necessary
+//    //  if all software correctly obeyed precedence rules but
+//    //  we'll do it just out of paranoia (and experience with
+//    //  gauss).
+//    //
+//    //  the choice is determined by the type of the node one
+//    //  step higher in the parse tree.
+//    //
 
-   parens=0;
-   switch( prevtype )
-      {
-      case nul:
-      case add:
-      case sub:
-         if( now(neg) )parens=1;
-         break;
+//    parens=0;
+//    switch( prevtype )
+//       {
+//       case nul:
+//       case add:
+//       case sub:
+//          if( now(neg) )parens=1;
+//          break;
 
-      case mul:
-         if( now(add) || now(sub) )parens=1;
-         if( now(dvd) || now(neg) )parens=1;
-         break;
+//       case mul:
+//          if( now(add) || now(sub) )parens=1;
+//          if( now(dvd) || now(neg) )parens=1;
+//          break;
 
-      case neg:
-         parens=1;
-         if( now(nam) || now(num) || now(mul) )parens=0;
-         if( now(log) || now(exp) || now(pow) )parens=0;
-         if( now(lag) || now(led)             )parens=0;
-         if( now(sum) || now(prd)             )parens=0;
-         break;
+//       case neg:
+//          parens=1;
+//          if( now(nam) || now(num) || now(mul) )parens=0;
+//          if( now(log) || now(exp) || now(pow) )parens=0;
+//          if( now(lag) || now(led)             )parens=0;
+//          if( now(sum) || now(prd)             )parens=0;
+//          break;
 
-      case dvd:
-         parens=1;
-         if( now(nam) || now(num) || now(pow) )parens=0;
-         if( now(sum) || now(prd)             )parens=0;
-         if( now(lag) || now(led)             )parens=0;
-         if( now(log) || now(exp)             )parens=0;
-         break;
+//       case dvd:
+//          parens=1;
+//          if( now(nam) || now(num) || now(pow) )parens=0;
+//          if( now(sum) || now(prd)             )parens=0;
+//          if( now(lag) || now(led)             )parens=0;
+//          if( now(log) || now(exp)             )parens=0;
+//          break;
          
-      case pow:
-         parens=1;
-         if( now(nam) || now(num) || now(log) || now(exp) )parens=0;
-         if( now(sum) || now(prd)                         )parens=0;
-         if( now(lag) || now(led)                         )parens=0;
-      break;
+//       case pow:
+//          parens=1;
+//          if( now(nam) || now(num) || now(log) || now(exp) )parens=0;
+//          if( now(sum) || now(prd)                         )parens=0;
+//          if( now(lag) || now(led)                         )parens=0;
+//       break;
 
-   case log:
-   case exp:
-   case lag:
-   case led:
-   case sum:
-   case prd:
-   case nam:
-   case num:
-   case equ:
-   case dom:
-      break;
+//    case log:
+//    case exp:
+//    case lag:
+//    case led:
+//    case sum:
+//    case prd:
+//    case nam:
+//    case num:
+//    case equ:
+//    case dom:
+//       break;
 
-   default:
-      FAULT("Invalid state reached in show_node");
-   }
+//    default:
+//       FAULT("Invalid state reached in show_node");
+//    }
 
-   //
-   //  now construct the current node
-   //
+//    //
+//    //  now construct the current node
+//    //
 
-   //
-   //  case 1: a few straightforward items
-   //
+//    //
+//    //  case 1: a few straightforward items
+//    //
 
-   switch( cur->type )
-      {
-      case nam:
-         return show_symbol(cur->str,cur->domain,setlist,sublist,mycontext);
+//    switch( cur->type )
+//       {
+//       case nam:
+//          return show_symbol(cur->str,cur->domain,setlist,sublist,mycontext);
 
-      case lag:
-      case led:
-         return show_node( cur->type, cur->r, setlist, sublist );
+//       case lag:
+//       case led:
+//          return show_node( cur->type, cur->r, setlist, sublist );
 
-      case dom:
-         return show_node( cur->type, cur->l, setlist, sublist );
+//       case dom:
+//          return show_node( cur->type, cur->l, setlist, sublist );
 
-      case lst:
-         FAULT("Unexpected lst state in show_node");
+//       case lst:
+//          FAULT("Unexpected lst state in show_node");
    
-      default:
-         break;
-      }
+//       default:
+//          break;
+//       }
 
-   //
-   //  case 2: sum and product, scalar form
-   //
+//    //
+//    //  case 2: sum and product, scalar form
+//    //
     
-   if( cur->type==sum || cur->type==prd )
-      if( is_sum_scalar() )
-         {
-         Item *ele;
+//    if( cur->type==sum || cur->type==prd )
+//       if( is_sum_scalar() )
+//          {
+//          Item *ele;
             
-         if( DBG )printf("scalar sum or product: %s\n",snprint(cur));
+//          if( DBG )printf("scalar sum or product: %s\n",snprint(cur));
 
-         lstr = (cur->l)->str;
+//          lstr = (cur->l)->str;
 
-         augsets = newsequence();
-                  catlist( augsets, setlist );
-         addlist( augsets, lstr );
+//          augsets = newsequence();
+//                   catlist( augsets, setlist );
+//          addlist( augsets, lstr );
          
-         op   = (cur->type == prd) ? "*" : "+";
-         lpar = (cur->type == prd) ? "(" : "" ;
-         rpar = (cur->type == prd) ? ")" : "" ;
+//          op   = (cur->type == prd) ? "*" : "+";
+//          lpar = (cur->type == prd) ? "(" : "" ;
+//          rpar = (cur->type == prd) ? ")" : "" ;
          
-         buf    = strdup("(");
-         thisop = " ";
+//          buf    = strdup("(");
+//          thisop = " ";
 
-         sumover = setelements(lstr);
-         for (ele = sumover->first; ele; ele = ele->next)
-         {
-            augsubs = newsequence();
-            catlist( augsubs, sublist );
-            addlist( augsubs, ele->str );
+//          sumover = setelements(lstr);
+//          for (ele = sumover->first; ele; ele = ele->next)
+//          {
+//             augsubs = newsequence();
+//             catlist( augsubs, sublist );
+//             addlist( augsubs, ele->str );
 
-            if( DBG )
-               {
-               printf("calling show_node for %s\n",ele->str);
-               printf("augsets = %s\n",slprint(augsets));
-               }
+//             if( DBG )
+//                {
+//                printf("calling show_node for %s\n",ele->str);
+//                printf("augsets = %s\n",slprint(augsets));
+//                }
 
-            rstr   = show_node( cur->type , cur->r , augsets, augsubs );
-            newbuf = concat(6,buf,"\n      ",thisop,lpar,rstr,rpar);
+//             rstr   = show_node( cur->type , cur->r , augsets, augsubs );
+//             newbuf = concat(6,buf,"\n      ",thisop,lpar,rstr,rpar);
 
-            thisop = op;
+//             thisop = op;
 
-            free(buf);
-            free(rstr);
-            freelist(augsubs);
+//             free(buf);
+//             free(rstr);
+//             freelist(augsubs);
 
-            buf = newbuf;
-         }
+//             buf = newbuf;
+//          }
 
-         newbuf = concat(2,buf,")");
-         free(buf);
+//          newbuf = concat(2,buf,")");
+//          free(buf);
 
-         freelist(augsets);
-         freelist(sumover);
+//          freelist(augsets);
+//          freelist(sumover);
 
-         return newbuf;
-      }
+//          return newbuf;
+//       }
 
-   //
-   //  case 3: sum or product in vector form
-   //
+//    //
+//    //  case 3: sum or product in vector form
+//    //
 
-   if( cur->type==sum || cur->type==prd )
-      {
-      if( DBG )printf("vector sum or product: %s\n",snprint(cur));
+//    if( cur->type==sum || cur->type==prd )
+//       {
+//       if( DBG )printf("vector sum or product: %s\n",snprint(cur));
       
-      lstr = (cur->l)->str;
+//       lstr = (cur->l)->str;
 
-      augsets = newsequence();
-      catlist( augsets, setlist );
-      addlist( augsets, lstr );
+//       augsets = newsequence();
+//       catlist( augsets, setlist );
+//       addlist( augsets, lstr );
 
-      augsubs = newsequence();
-      catlist( augsubs, sublist );
-      addlist( augsubs, "*" );
+//       augsubs = newsequence();
+//       catlist( augsubs, sublist );
+//       addlist( augsubs, "*" );
 
-      beginfunc = codegen_begin_func(cur->str,lstr);
-      rstr      = show_node( cur->type , cur->r , augsets, augsubs );
-      endfunc   = codegen_end_func();
+//       beginfunc = codegen_begin_func(cur->str,lstr);
+//       rstr      = show_node( cur->type , cur->r , augsets, augsubs );
+//       endfunc   = codegen_end_func();
 
-      buf = concat(3,beginfunc,rstr,endfunc);
+//       buf = concat(3,beginfunc,rstr,endfunc);
 
-      free(beginfunc);
-      free(rstr);
-      free(endfunc);
+//       free(beginfunc);
+//       free(rstr);
+//       free(endfunc);
 
-      freelist(augsubs);
-      freelist(augsets);
+//       freelist(augsubs);
+//       freelist(augsets);
 
-      return buf;
-   }
+//       return buf;
+//    }
 
-   //
-   //  case 4: everything else
-   //
+//    //
+//    //  case 4: everything else
+//    //
 
-   switch( cur->type )
-      {
-      case log:
-      case exp:
-         isfunc = 1;
-         lstr = codegen_begin_func(cur->str,0);
-         endfunc = codegen_end_func();
-         op = "";
-         break;
+//    switch( cur->type )
+//       {
+//       case log:
+//       case exp:
+//          isfunc = 1;
+//          lstr = codegen_begin_func(cur->str,0);
+//          endfunc = codegen_end_func();
+//          op = "";
+//          break;
 
-   // GCS 2022-12-15 Modified power operator to ** instead of ^
-   case pow:
-      isfunc = 0;
-      lstr = show_node(cur->type, cur->l, setlist, sublist);
-      endfunc = strdup("");
-      op = "**";
-      break;
+//    // GCS 2022-12-15 Modified power operator to ** instead of ^
+//    case pow:
+//       isfunc = 0;
+//       lstr = show_node(cur->type, cur->l, setlist, sublist);
+//       endfunc = strdup("");
+//       op = "**";
+//       break;
 
-      default:
-         isfunc = 0;
-         lstr = show_node( cur->type , cur->l , setlist, sublist );
-         endfunc = strdup("");
-         op = cur->str;
-      }
+//       default:
+//          isfunc = 0;
+//          lstr = show_node( cur->type , cur->l , setlist, sublist );
+//          endfunc = strdup("");
+//          op = cur->str;
+//       }
 
-   rstr = show_node( cur->type , cur->r , setlist, sublist );
+//    rstr = show_node( cur->type , cur->r , setlist, sublist );
 
-   cr = "" ;
-   // GCS 2022-12-15 modified cr string to handle Python whitespace issues.
-   if( strlen(lstr)+strlen(rstr) > 70 
-      || strlen(lstr) > 40
-      || strlen(rstr) > 40)cr = " \\\n        ";
+//    cr = "" ;
+//    // GCS 2022-12-15 modified cr string to handle Python whitespace issues.
+//    if( strlen(lstr)+strlen(rstr) > 70 
+//       || strlen(lstr) > 40
+//       || strlen(rstr) > 40)cr = " \\\n        ";
 
-   lpar = (parens && isfunc==0) ? "(" : "" ;
-   rpar = (parens && isfunc==0) ? ")" : "" ;
+//    lpar = (parens && isfunc==0) ? "(" : "" ;
+//    rpar = (parens && isfunc==0) ? ")" : "" ;
 
-   wrap_right = 0;
-   if( cur->type == sub ) 
-      if( cur->r->type == add || cur->r->type == sub )
-         wrap_right = 1;
+//    wrap_right = 0;
+//    if( cur->type == sub ) 
+//       if( cur->r->type == add || cur->r->type == sub )
+//          wrap_right = 1;
 
-   if( wrap_right )
-      buf = concat(9,lpar,lstr,cr,op,"(",rstr,")",rpar,endfunc);
-   else
-      buf = concat(7,lpar,lstr,cr,op,rstr,rpar,endfunc);
+//    if( wrap_right )
+//       buf = concat(9,lpar,lstr,cr,op,"(",rstr,")",rpar,endfunc);
+//    else
+//       buf = concat(7,lpar,lstr,cr,op,rstr,rpar,endfunc);
    
-   free(lstr);
-   free(rstr);
-   free(endfunc);
+//    free(lstr);
+//    free(rstr);
+//    free(endfunc);
 
-   return buf;
-}
+//    return buf;
+// }
 
 
 /*-------------------------------------------------------------------*

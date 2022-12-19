@@ -17,6 +17,10 @@ void  (*codegen_end_eqn    )();
 char* (*codegen_begin_func )();
 char* (*codegen_end_func   )();
 char* (*codegen_show_symbol)();
+void  (*codegen_wrap_write )();
+void  (*codegen_write_file )();
+void  (*codegen_show_eq    )();
+char *(*codegen_show_node  )();
 char* (*codegen_spprint    )();
 
 static Array *langinit=0;
@@ -130,6 +134,26 @@ void lang_end_func(char* (*fnc)())
 void lang_show_symbol(char* (*fnc)())
 {
    codegen_show_symbol = fnc;
+}
+
+void lang_show_node(char *(*fnc)())
+{
+   codegen_show_symbol = fnc;
+}
+
+void lang_show_eq(void (*fnc)())
+{
+   codegen_show_eq = fnc;
+}
+
+void lang_wrap_write(void (*fnc)())
+{
+   codegen_wrap_write = fnc;
+}
+
+void lang_write_file(void (*fnc)())
+{
+   codegen_write_file = fnc;
 }
 
 void lang_spprint(char* (*fnc)())

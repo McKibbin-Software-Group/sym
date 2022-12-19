@@ -38,5 +38,6 @@ List* sub_tuple(char*,List*);
 
 void wrap_write(char*,int,int);
 void write_file(char*);
+char *show_symbol(char *, List *, List *, List *, Context);
 
 #endif /* OUTPUT_H */

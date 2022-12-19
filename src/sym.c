@@ -21,6 +21,7 @@
 #include "sets.h"
 #include "str.h"
 #include "symtable.h"
+#include "codegen.h"
 #include "version.h"
 #include "xmalloc.h"
 #include <stdio.h>
@@ -326,7 +327,7 @@ int main(int argc, char *argv[])
    //
 
    if (error_count() == 0 || DBG)
-      write_file(basename);
+      codegen_write_file(basename);
    else
       fatal_error("%s", "No code file created");
 

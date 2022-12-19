@@ -38,8 +38,6 @@ typedef struct node_struct
    Node ;
 
 Node* newnode(Nodetype,char*,Node*,Node*);
-char* node2string(Node*);
-char* snprint(Node*);
 void  freenode(Node*);
 
 /* Handy macros */
@@ -48,5 +46,7 @@ void  freenode(Node*);
 #define isnumber(nde) ( nde && nde->type==num )
 #define isone(nde)	 ( nde && nde->type==num && strcmp(nde->str,"1")==0 )
 #define iszero(nde)	 ( nde && nde->type==num && strcmp(nde->str,"0")==0 )
+
+#include "spprint.h"
 
 #endif /* NODES_H */

@@ -150,6 +150,10 @@ FILE *varinfo;
 FILE *vars;
 FILE *optmap;
 
+// Listing of variables (vector name and index) in the equations.
+FILE *eqnmap;
+static int writingEquations = 0;
+
 //
 //  MSGPROC vectors
 //
@@ -537,7 +541,12 @@ static char *get_msgname(char *str, List *sublist, Context context)
 
    numsubs = sub_offset(str, sublist, var->vecoff[sel]);
 
-   sprintf(buf, "%s[%s]", vecname[vecid], slprint(numsubs));
+   sprintf(buf, "self.%s[%s]", vecname[vecid], slprint(numsubs));
+
+   if (writingEquations) 
+   {
+      fprintf(eqnmap, "%s,%s\n", vecname[vecid], slprint(numsubs));
+   }
 
    freelist(numsubs);
 
@@ -819,22 +828,28 @@ void PYTHON_begin_file(char *basename)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
+   fname = concat(2, basename, "_eqnmap.csv");
+   eqnmap = fopen(fname, "w");
+   if (eqnmap == 0)
+      msg_error("Could not create file: %s", fname);
+   free(fname);
+
    for (i = NUL; i <= UNK; i++)
       vecinfo[i] = PYTHON_ORIGIN;
 
    vecname[NUL] = "";
-   vecname[Z1L] = "self.z1l";
-   vecname[ZEL] = "self.zel";
-   vecname[J1L] = "self.j1l";
-   vecname[X1L] = "self.x1l";
-   vecname[Z1R] = "self.z1r";
-   vecname[ZER] = "self.zer";
-   vecname[YJR] = "self.yjr";
-   vecname[YXR] = "self.yxr";
-   vecname[EXO] = "self.exo";
-   vecname[EXZ] = "self.exz";
-   vecname[PAR] = "self.par";
-   vecname[X1R] = "self.x1r";
+   vecname[Z1L] = "z1l";
+   vecname[ZEL] = "zel";
+   vecname[J1L] = "j1l";
+   vecname[X1L] = "x1l";
+   vecname[Z1R] = "z1r";
+   vecname[ZER] = "zer";
+   vecname[YJR] = "yjr";
+   vecname[YXR] = "yxr";
+   vecname[EXO] = "exo";
+   vecname[EXZ] = "exz";
+   vecname[PAR] = "par";
+   vecname[X1R] = "x1r";
    vecname[UNK] = "";
 
    fprintf(code, "import numpy as np\n");
@@ -866,6 +881,7 @@ void PYTHON_end_file()
    fclose(varinfo);
    fclose(vars);
    fclose(optmap);
+   fclose(eqnmap);
 
    ecount = MSGPROC_scalar - 1;
    vcount = vecinfo[Z1L] + vecinfo[ZEL] + vecinfo[J1L] + vecinfo[X1L] - 4 * PYTHON_ORIGIN;
@@ -1493,6 +1509,8 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
    lstr = codegen_show_node(nul, getlhs(eq), setlist, sublist);
    rstr = codegen_show_node(nul, getrhs(eq), setlist, sublist);
    
+   writingEquations = 1;
+
    codegen_begin_eqn(eq);
 
    char *functionName = msgname_to_eqnname(lstr);
@@ -1529,6 +1547,8 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
 
    free(all);
    codegen_end_eqn(eq);
+   writingEquations = 0;
+
 }
 
 char *str_replace(char *orig, char *rep, char *with)
@@ -1580,17 +1600,24 @@ char *str_replace(char *orig, char *rep, char *with)
    return result;
 }
 
+// static char *msgname_to_eqnname(char *msgname)
+// {
+//    char *step1 = str_replace(msgname, "[", "_");
+//    char *step2 = str_replace(step2, "]", "()");
+//    free(step1);
+//    return step2;
+// }
+
 static char *msgname_to_eqnname(char *msgname)
 {
 
-   char *step1 = str_replace(msgname, "self." , "");
+   char *step1 = str_replace(msgname, "self.", "");
    char *step2 = str_replace(step1, "[", "_");
-   char *step3 = str_replace(step2, "]", "()");
+   char *step3 = str_replace(step2, "]", "(self)");
    free(step1);
    free(step2);
    return step3;
 }
-
 
     /*--------------------------------------------------------------------*
      *  show_node

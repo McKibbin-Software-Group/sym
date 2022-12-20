@@ -291,8 +291,6 @@ static Variable *v_head = 0;
 static char *get_msgname(char *, List *, Context);
 static void msg_error(char *, char *);
 static void write_pythonname(FILE *, Variable *, List *);
-static char *str_replace(char *orig, char *rep, char *with);
-static char *msgname_to_eqnname(char *msgname);
 
 //----------------------------------------------------------------------//
 //  msg_error()
@@ -823,27 +821,26 @@ void PYTHON_begin_file(char *basename)
       vecinfo[i] = PYTHON_ORIGIN;
 
    vecname[NUL] = "";
-   vecname[Z1L] = "self.z1l";
-   vecname[ZEL] = "self.zel";
-   vecname[J1L] = "self.j1l";
-   vecname[X1L] = "self.x1l";
-   vecname[Z1R] = "self.z1r";
-   vecname[ZER] = "self.zer";
-   vecname[YJR] = "self.yjr";
-   vecname[YXR] = "self.yxr";
-   vecname[EXO] = "self.exo";
-   vecname[EXZ] = "self.exz";
-   vecname[PAR] = "self.par";
-   vecname[X1R] = "self.x1r";
+   vecname[Z1L] = "z1l";
+   vecname[ZEL] = "zel";
+   vecname[J1L] = "j1l";
+   vecname[X1L] = "x1l";
+   vecname[Z1R] = "z1r";
+   vecname[ZER] = "zer";
+   vecname[YJR] = "yjr";
+   vecname[YXR] = "yxr";
+   vecname[EXO] = "exo";
+   vecname[EXZ] = "exz";
+   vecname[PAR] = "par";
+   vecname[X1R] = "x1r";
    vecname[UNK] = "";
 
    fprintf(code, "import numpy as np\n");
    fprintf(code, "from math import exp\n");
    fprintf(code, "from math import log\n");
-   fprintf(code, "from gcubed.base_equations import BaseEquations\n");
    fprintf(code, "\n");
    fprintf(code, "\n");
-   fprintf(code, "class Equations(BaseEquations):\n");
+   fprintf(code, "def msgproc(x1l:np.ndarray, j1l:np.ndarray, zel:np.ndarray, z1l:np.ndarray, x1r:np.ndarray, j1r:np.ndarray, z1r:np.ndarray, zer:np.ndarray, yjr:np.ndarray, yxr:np.ndarray, exo:np.ndarray, exz:np.ndarray, par:np.ndarray):\n");
    fprintf(code, "\n");
 }
 
@@ -860,7 +857,7 @@ void PYTHON_end_file()
    void *cur;
    char *err;
 
-   fprintf(code, "\n# End of G-cubed equations class declaration\n");
+   fprintf(code, "\n# END OF MSGPROC function declaration\n");
 
    fclose(varmap);
    fclose(varinfo);
@@ -1246,18 +1243,18 @@ void PYTHON_begin_block(void *eq)
 
    esets = eqnsets(eq);
 
-   // fprintf(code, "    # Equation block %d\n", nblk);
+   fprintf(code, "    # Equation block %d\n", nblk);
 
    if (islvalue(eq) == 0)
       msg_error("%s", "LHS of an equation is not a variable");
 
-   // if (esets->n)
-   //    fprintf(code, "    #    Defined over sets (%s)\n", slprint(esets));
+   if (esets->n)
+      fprintf(code, "    #    Defined over sets (%s)\n", slprint(esets));
 
-   // if (nscalar)
-   //    fprintf(code, "    #    Scalar equations %d-%d (%d total)\n\n", nstart, nend, nscalar);
-   // else
-   //    fprintf(code, "    #    Contains undeclared symbols\n");
+   if (nscalar)
+      fprintf(code, "    #    Scalar equations %d-%d (%d total)\n\n", nstart, nend, nscalar);
+   else
+      fprintf(code, "    #    Contains undeclared symbols\n");
 }
 
 //----------------------------------------------------------------------//
@@ -1289,7 +1286,7 @@ char *PYTHON_show_symbol(char *str, List *sublist, Context context)
 
 void PYTHON_begin_eqn(void *eq)
 {
-   fprintf(code, "\n");
+   fprintf(code, "    ");
 }
 
 //----------------------------------------------------------------------//
@@ -1299,7 +1296,7 @@ void PYTHON_begin_eqn(void *eq)
 //----------------------------------------------------------------------//
 void PYTHON_end_eqn(void *eq)
 {
-   fprintf(code, "\n");
+   fprintf(code, "\n\n");
 }
 
 /*--------------------------------------------------------------------*
@@ -1495,14 +1492,10 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
    
    codegen_begin_eqn(eq);
 
-   char *functionName = msgname_to_eqnname(lstr);
-   fprintf(code, "    def %s -> float:\n", functionName);
-   free(functionName);
-
-   if (is_eqn_normalized())
-           all = concat(5, "        ",lstr, " - (", rstr, ")");
+   if (is_eqn_normalized()) 
+      all = concat(4, lstr, " - (", rstr, ")");
    else 
-      all = concat(4, "        ",lstr, " = ", rstr);
+      all = concat(3, lstr, " = ", rstr);
 
    free(lstr);
    free(rstr);
@@ -1531,77 +1524,15 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
    codegen_end_eqn(eq);
 }
 
-char *str_replace(char *orig, char *rep, char *with)
-{
-   char *result;  // the return string
-   char *ins;     // the next insert point
-   char *tmp;     // varies
-   int len_rep;   // length of rep (the string to remove)
-   int len_with;  // length of with (the string to replace rep with)
-   int len_front; // distance between rep and end of last rep
-   int count;     // number of replacements
-
-   // sanity checks and initialization
-   if (!orig || !rep)
-      return NULL;
-   len_rep = strlen(rep);
-   if (len_rep == 0)
-      return NULL; // empty rep causes infinite loop during count
-   if (!with)
-      with = "";
-   len_with = strlen(with);
-
-   // count the number of replacements needed
-   ins = orig;
-   for (count = 0; (tmp = strstr(ins, rep)); ++count)
-   {
-      ins = tmp + len_rep;
-   }
-
-   tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
-
-   if (!result)
-      return NULL;
-
-   // first time through the loop, all the variable are set correctly
-   // from here on,
-   //    tmp points to the end of the result string
-   //    ins points to the next occurrence of rep in orig
-   //    orig points to the remainder of orig after "end of rep"
-   while (count--)
-   {
-      ins = strstr(orig, rep);
-      len_front = ins - orig;
-      tmp = strncpy(tmp, orig, len_front) + len_front;
-      tmp = strcpy(tmp, with) + len_with;
-      orig += len_front + len_rep; // move to next "end of rep"
-   }
-   strcpy(tmp, orig);
-   return result;
-}
-
-static char *msgname_to_eqnname(char *msgname)
-{
-
-   char *step1 = str_replace(msgname, "self." , "");
-   char *step2 = str_replace(step1, "[", "_");
-   char *step3 = str_replace(step2, "]", "()");
-   free(step1);
-   free(step2);
-   return step3;
-}
-
-
-    /*--------------------------------------------------------------------*
-     *  show_node
-     *
-     *  Generate the node recursively.  This allocates and frees a
-     *  lot of small chunks of memory as it constructs nodes from the
-     *  bottom up.  Avoids having any fixed buffer sizes but is a
-     *  bit tedious as a result.
-     *--------------------------------------------------------------------*/
-    char *
-    PYTHON_show_node(Nodetype prevtype, Node *cur, List *setlist, List *sublist)
+/*--------------------------------------------------------------------*
+ *  show_node
+ *
+ *  Generate the node recursively.  This allocates and frees a
+ *  lot of small chunks of memory as it constructs nodes from the
+ *  bottom up.  Avoids having any fixed buffer sizes but is a
+ *  bit tedious as a result.
+ *--------------------------------------------------------------------*/
+char *PYTHON_show_node(Nodetype prevtype, Node *cur, List *setlist, List *sublist)
 {
 
    int parens, wrap_right;
@@ -1774,7 +1705,7 @@ static char *msgname_to_eqnname(char *msgname)
             }
 
             rstr = codegen_show_node(cur->type, cur->r, augsets, augsubs);
-            newbuf = concat(6, buf, " ", thisop, lpar, rstr, rpar);
+            newbuf = concat(6, buf, "\n      ", thisop, lpar, rstr, rpar);
 
             thisop = op;
 
@@ -1860,6 +1791,12 @@ static char *msgname_to_eqnname(char *msgname)
 
    rstr = codegen_show_node(cur->type, cur->r, setlist, sublist);
 
+   cr = "";
+   // GCS 2022-12-15 modified cr string to add mid-statement end of line '\' 
+   // and to handle Python whitespace issues.
+   if (strlen(lstr) + strlen(rstr) > 70 || strlen(lstr) > 40 || strlen(rstr) > 40)
+      cr = " \\\n        ";
+
    lpar = (parens && isfunc == 0) ? "(" : "";
    rpar = (parens && isfunc == 0) ? ")" : "";
 
@@ -1869,9 +1806,9 @@ static char *msgname_to_eqnname(char *msgname)
          wrap_right = 1;
 
    if (wrap_right)
-      buf = concat(8, lpar, lstr, op, "(", rstr, ")", rpar, endfunc);
+      buf = concat(9, lpar, lstr, cr, op, "(", rstr, ")", rpar, endfunc);
    else
-      buf = concat(6, lpar, lstr, op, rstr, rpar, endfunc);
+      buf = concat(7, lpar, lstr, cr, op, rstr, rpar, endfunc);
 
    free(lstr);
    free(rstr);

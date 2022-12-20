@@ -275,8 +275,7 @@ void Default_wrap_write(char *line, int addcr, int commaok)
 /*--------------------------------------------------------------------*
  *  write_file
  *
- *  Write out a file in the selected language.  This is the only
- *  public method in the file.
+ *  Write out a file in the selected language.
  *--------------------------------------------------------------------*/
 void Default_write_file(char *basename)
 {
@@ -392,11 +391,11 @@ void Default_write_file(char *basename)
 }
 
 /*--------------------------------------------------------------------*
-   *  show_eq
-   *
-   *  Generate and print a scalar equation by recursively descending
-   *  through the node tree.
-   *--------------------------------------------------------------------*/
+*  show_eq
+*
+*  Generate and print a scalar equation by recursively descending
+*  through the node tree.
+*--------------------------------------------------------------------*/
 void Default_show_eq(void *eq, List *setlist, List *sublist)
 {
    Node *getlhs(), *getrhs();
@@ -475,8 +474,6 @@ char *Default_show_node(Nodetype prevtype, Node *cur, List *setlist, List *subli
    validate(cur, NODEOBJ, "show_node");
    validate(setlist, LISTOBJ, "show_block for setlist");
    validate(sublist, LISTOBJ, "show_block for sublist");
-
-#define now(arg) (cur->type == arg)
 
    //
    //  decide whether the current node should be wrapped with
@@ -691,12 +688,11 @@ char *Default_show_node(Nodetype prevtype, Node *cur, List *setlist, List *subli
       op = "";
       break;
 
-   // GCS 2022-12-15 Modified power operator to ** instead of ^
    case pow:
       isfunc = 0;
       lstr = codegen_show_node(cur->type, cur->l, setlist, sublist);
       endfunc = strdup("");
-      op = "**";
+      op = "^";
       break;
 
    default:
@@ -709,9 +705,8 @@ char *Default_show_node(Nodetype prevtype, Node *cur, List *setlist, List *subli
    rstr = codegen_show_node(cur->type, cur->r, setlist, sublist);
 
    cr = "";
-   // GCS 2022-12-15 modified cr string to handle Python whitespace issues.
    if (strlen(lstr) + strlen(rstr) > 70 || strlen(lstr) > 40 || strlen(rstr) > 40)
-      cr = " \\\n        ";
+      cr = " \n        ";
 
    lpar = (parens && isfunc == 0) ? "(" : "";
    rpar = (parens && isfunc == 0) ? ")" : "";

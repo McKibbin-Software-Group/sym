@@ -138,7 +138,7 @@ void lang_show_symbol(char* (*fnc)())
 
 void lang_show_node(char *(*fnc)())
 {
-   codegen_show_symbol = fnc;
+   codegen_show_node = fnc;
 }
 
 void lang_show_eq(void (*fnc)())

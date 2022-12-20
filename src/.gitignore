@@ -3,3 +3,13 @@ test
 *.exe
 *.o
 sym
+*.sym
+*.lis
+*.py
+*.ox
+*.html
+*.csv
+*.md
+lastbuild
+.vscode/**
+

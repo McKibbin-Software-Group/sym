@@ -1514,7 +1514,7 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
    codegen_begin_eqn(eq);
 
    char *functionName = msgname_to_eqnname(lstr);
-   fprintf(code, "    def %s -> float:\n", functionName);
+   fprintf(code, "    def %s:\n", functionName);
    free(functionName);
 
    if (is_eqn_normalized())

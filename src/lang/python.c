@@ -541,7 +541,14 @@ static char *get_msgname(char *str, List *sublist, Context context)
 
    numsubs = sub_offset(str, sublist, var->vecoff[sel]);
 
-   sprintf(buf, "self.%s[%s]", vecname[vecid], slprint(numsubs));
+   if (writingEquations)
+   {
+      sprintf(buf, "self.%s[%s]", vecname[vecid], slprint(numsubs));
+   }
+      else
+   {
+      sprintf(buf, "%s[%s]", vecname[vecid], slprint(numsubs));
+   }
 
    if (writingEquations) 
    {

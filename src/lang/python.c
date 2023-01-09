@@ -1269,7 +1269,7 @@ void PYTHON_begin_block(void *eq)
 
    esets = eqnsets(eq);
 
-   // fprintf(code, "    # Equation block %d\n", nblk);
+   fprintf(code, "    # Equation block %d\n", nblk);
 
    if (islvalue(eq) == 0)
       msg_error("%s", "LHS of an equation is not a variable");
@@ -1513,10 +1513,11 @@ void PYTHON_show_eq(void *eq, List *setlist, List *sublist)
    char *lstr, *rstr, *all;
    char *head, *tail;
 
+   writingEquations = 1;
+
    lstr = codegen_show_node(nul, getlhs(eq), setlist, sublist);
    rstr = codegen_show_node(nul, getrhs(eq), setlist, sublist);
    
-   writingEquations = 1;
 
    codegen_begin_eqn(eq);
 

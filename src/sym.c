@@ -235,7 +235,15 @@ int main(int argc, char *argv[])
    basename = strdup(codefile);
    if ((ext = strrchr(basename, '.')))
       *ext = '\0';
-   listfile = concat(2, basename, ".lis");
+   if (strcmp(lang, "html") != 0)
+   {
+      listfile = concat(2, basename, ".lis");
+   }
+   else 
+   {
+      // Remove this rubbish file once the processor has finished. we only want the HTML output.
+      listfile = "rubbish.lis";
+   }
 
    //
    //  open the output files; input file will be opened by read_file
@@ -245,7 +253,7 @@ int main(int argc, char *argv[])
    if (code == 0)
       fatal_error("Could not open output code file %s\n", codefile);
 
-   if (mergeonly == 0)
+   if (mergeonly == 0) 
    {
       info = fopen(listfile, "w");
       if (info == 0)

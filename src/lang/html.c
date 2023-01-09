@@ -992,6 +992,7 @@ void HTML_write_file(char *basename)
 
    fclose(code);
    fclose(info);
+   remove("rubbish.lis");
 }
 
 /*--------------------------------------------------------------------*

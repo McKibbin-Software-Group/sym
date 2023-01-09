@@ -145,13 +145,13 @@ static int MSGPROC_vars = 1;
 //  Debugging files
 //
 
-FILE *varmap;
-FILE *varinfo;
-FILE *vars;
-FILE *optmap;
+FILE *python_varmap;
+FILE *python_varinfo;
+FILE *python_vars;
+FILE *python_optmap;
 
 // Listing of variables (vector name and index) in the equations.
-FILE *eqnmap;
+FILE *python_eqnmap;
 static int writingEquations = 0;
 
 //
@@ -350,10 +350,10 @@ static void write_varmap(Variable *thisvar, List *setlist)
             subs = strchr(name, '[');
             *subs++ = '\0';
 
-            fprintf(varmap, "\"%s(%s)\",", thisvar->str, slprint(cur));
-            fprintf(varmap, "\"%s[%s]\",%s,%s,", name, subs, name, subs);
-            write_pythonname(varmap, thisvar, cur);
-            fprintf(varmap, "\n");
+            fprintf(python_varmap, "\"%s(%s)\",", thisvar->str, slprint(cur));
+            fprintf(python_varmap, "\"%s[%s]\",%s,%s,", name, subs, name, subs);
+            write_pythonname(python_varmap, thisvar, cur);
+            fprintf(python_varmap, "\n");
 
             //
             //  write a modified version to Yiyong's optmap file
@@ -361,12 +361,12 @@ static void write_varmap(Variable *thisvar, List *setlist)
 
             if (thisvar->stype == par)
                n = 0;
-            fprintf(optmap, "%d,", n++);
-            fprintf(optmap, "\"%s[%s]\",%s,%s,", name, subs, name, subs);
-            write_pythonname(optmap, thisvar, cur);
+            fprintf(python_optmap, "%d,", n++);
+            fprintf(python_optmap, "\"%s[%s]\",%s,%s,", name, subs, name, subs);
+            write_pythonname(python_optmap, thisvar, cur);
             if (thisvar->stype == par)
-               fprintf(optmap, "0");
-            fprintf(optmap, "\n");
+               fprintf(python_optmap, "0");
+            fprintf(python_optmap, "\n");
 
             free(name);
          }
@@ -431,10 +431,10 @@ static void write_vars(Variable *thisvar, List *setlist, char *desc)
 
    for (cur = cart_first(); cur; cur = cart_next())
    {
-      fprintf(vars, "%d,", MSGPROC_vars++);
-      fprintf(vars, "\"%s(%s)\",", thisvar->str, slprint(cur));
-      fprintf(vars, "\"%s\",", desc);
-      fprintf(vars, "\"%s\",", thisvar->unit);
+      fprintf(python_vars, "%d,", MSGPROC_vars++);
+      fprintf(python_vars, "\"%s(%s)\",", thisvar->str, slprint(cur));
+      fprintf(python_vars, "\"%s\",", desc);
+      fprintf(python_vars, "\"%s\",", thisvar->unit);
 
       if (region_index >= 0)
       {
@@ -442,9 +442,9 @@ static void write_vars(Variable *thisvar, List *setlist, char *desc)
             ;
          region = sub->str;
       }
-      fprintf(vars, "\"%s\",", region);
+      fprintf(python_vars, "\"%s\",", region);
 
-      fprintf(vars, "\n");
+      fprintf(python_vars, "\n");
    }
 }
 
@@ -552,7 +552,7 @@ static char *get_msgname(char *str, List *sublist, Context context)
 
    if (writingEquations) 
    {
-      fprintf(eqnmap, "%s,%s\n", vecname[vecid], slprint(numsubs));
+      fprintf(python_eqnmap, "%s,%s\n", vecname[vecid], slprint(numsubs));
    }
 
    freelist(numsubs);
@@ -812,32 +812,32 @@ void PYTHON_begin_file(char *basename)
    char *fname;
 
    fname = concat(2, basename, "_varmap.csv");
-   varmap = fopen(fname, "w");
-   if (varmap == 0)
+   python_varmap = fopen(fname, "w");
+   if (python_varmap == 0)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
    fname = concat(2, basename, "_optmap.csv");
-   optmap = fopen(fname, "w");
-   if (optmap == 0)
+   python_optmap = fopen(fname, "w");
+   if (python_optmap == 0)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
    fname = concat(2, basename, "_varinfo.csv");
-   varinfo = fopen(fname, "w");
-   if (varinfo == 0)
+   python_varinfo = fopen(fname, "w");
+   if (python_varinfo == 0)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
    fname = concat(2, basename, "_vars.csv");
-   vars = fopen(fname, "w");
-   if (vars == 0)
+   python_vars = fopen(fname, "w");
+   if (python_vars == 0)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
    fname = concat(2, basename, "_eqnmap.csv");
-   eqnmap = fopen(fname, "w");
-   if (eqnmap == 0)
+   python_eqnmap = fopen(fname, "w");
+   if (python_eqnmap == 0)
       msg_error("Could not create file: %s", fname);
    free(fname);
 
@@ -884,11 +884,11 @@ void PYTHON_end_file()
 
    fprintf(code, "\n# End of G-cubed equations class declaration\n");
 
-   fclose(varmap);
-   fclose(varinfo);
-   fclose(vars);
-   fclose(optmap);
-   fclose(eqnmap);
+   fclose(python_varmap);
+   fclose(python_varinfo);
+   fclose(python_vars);
+   fclose(python_optmap);
+   fclose(python_eqnmap);
 
    ecount = MSGPROC_scalar - 1;
    vcount = vecinfo[Z1L] + vecinfo[ZEL] + vecinfo[J1L] + vecinfo[X1L] - 4 * PYTHON_ORIGIN;
@@ -1162,7 +1162,7 @@ void PYTHON_declare(void *sym)
    else
       strcpy(setlist, "");
 
-   fprintf(varinfo, "\"%s%s\",%d,%s,%s,\"%s\",\"%s\"\n",
+   fprintf(python_varinfo, "\"%s%s\",%d,%s,%s,\"%s\",\"%s\"\n",
            name, setlist, count, newvar->type, newvar->unit, desc, slprint(attlist));
 
    if (DBG)

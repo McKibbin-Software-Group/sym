@@ -206,7 +206,7 @@ struct vartype_info vlist[] =
 //  relative to US rather than own GDP.
 
 char *units[] = 
-   { "del", "pct", "gdp", "usgdp", "cent", "gwh", "gwhgdp", 
+   { "del", "pct", "gdp", "usgdp", "cent", "dollar", "gwh", "gwhgdp", 
      "btu", "mmt", "btugdp", "mmtgdp", "btuusgdp", "mmtusgdp", 0 };
 
 char *us_units[] =

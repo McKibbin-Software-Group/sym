@@ -52,12 +52,11 @@ typedef struct htmlset Htmlset;
 Array *htmlsets = 0;
 
 static char *HTML_css = "a:link { color:blue; } \
-body { margin-left:2em; margin-top:2em; } \
-table.dec {} \
+body { margin-left:2em; margin-top:2em; margin-right:2em; } \
 td { padding-left: 1em; padding-right: 1em; } \
 th { text-align: left; padding-left: 1em; padding-right: 1em; } \
 div.heading { margin-top: 2em; font-weight: bold; font-size: 120%; } \
-div.dblock { margin-top: 1em; margin-left: 2em; } \
+div.dblock { margin-top: 0em; margin-left: 0em; margin-right: 0em; } \
 div.eblock { margin-top: 1em; overflow-x: scroll;  } \
 div.eqn { margin-top: 1em; margin-left: 2em;} \
 ";
@@ -382,13 +381,16 @@ static char *htmlqualifier(List *sets)
 void HTML_begin_file(char *basename)
 {
    fprintf(code, "<html>\n<head>\n");
-   fprintf(code, "<title>%s</title>\n", basename);
-   fprintf(code, "<style type=\"text/css\">\n%s</style>\n", HTML_css);
+   fprintf(code, "<title>G-Cubed %s</title>\n", basename);
+   fprintf(code, "<link rel='stylesheet' href='https://lucid-wei.github.io/g-cubed_teaching_model/assets/css/just-the-docs-default.css'/>");
+   fprintf(code, "<script src='https://lucid-wei.github.io/g-cubed_teaching_model/assets/js/vendor/lunr.min.js'></script>");
+   fprintf(code, "<script src='https://lucid-wei.github.io/g-cubed_teaching_model/assets/js/just-the-docs.js'></script>");
+   fprintf(code, "<style type='text/css'>\n%s</style>\n", HTML_css);
    fprintf(code, "<script>MathJax = { jax: ['input/tex', 'output/svg'], tex: { tags: 'ams', packages: {'[+]': ['textmacros']} }, svg: { displayAlign: 'left' }, loader: {load: ['[tex]/textmacros']} };</script>");
    //   fprintf(code,"<script>MathJax = { tex: { tags: 'ams',packages: {'[+]': ['textmacros']} }, svg: {fontCache: 'global', displayAlign: 'left', displayIndent: '2em', mtextInheritFont: true},loader: {load: ['[tex]/textmacros']} };</script>");
    fprintf(code, "<script type='text/javascript' id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js'></script>\n");
    fprintf(code, "</head>\n<body>\n");
-   fprintf(code, "<h1>%s</h1>\n", basename);
+   fprintf(code, "<h1>G-Cubed %s</h1>\n", basename);
 }
 
 //----------------------------------------------------------------------//
@@ -633,9 +635,9 @@ void HTML_begin_block(void *eq)
    fprintf(code, "<a id='%d'/>", nblk);
 
    if (label)
-      fprintf(code, "<div class=\"eblock\">\nEquation %d: <a href='#%s'>%s</a>: %s<br>\n", equationNumber, eqnLhsVariableName, eqnLhsVariableName, label);
+      fprintf(code, "Equation %d: <a href='#%s'>%s</a>: %s<br>\n", equationNumber, eqnLhsVariableName, eqnLhsVariableName, label);
    else
-      fprintf(code, "<div class=\"eblock\">\nEquation %d: <a href='#%s'>%s</a><br>\n", equationNumber, eqnLhsVariableName, eqnLhsVariableName);
+      fprintf(code, "Equation %d: <a href='#%s'>%s</a><br>\n", equationNumber, eqnLhsVariableName, eqnLhsVariableName);
 
    switch (nscalar)
    {
@@ -652,7 +654,7 @@ void HTML_begin_block(void *eq)
       break;
    }
 
-   fprintf(code, "<div class=\"eqn\"> \\[ ");
+   fprintf(code, "<div class=\"eblock\">\n<div class=\"eqn\"> \\[ ");
 }
 
 //----------------------------------------------------------------------//
@@ -661,7 +663,7 @@ void HTML_begin_block(void *eq)
 
 void HTML_end_eqn(void *eq)
 {
-   fprintf(code, " \\] </div>\n</div>\n");
+   fprintf(code, " \\]\n</div>\n</div>\n");
 }
 
 //----------------------------------------------------------------------//

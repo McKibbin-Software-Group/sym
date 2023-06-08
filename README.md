@@ -22,5 +22,23 @@ an open-source econometric general equilibrium model of the US economy.
 
 For more information and documentation, please see 
 the [sym documentation site](https://pjwilcoxen.github.io/sym/).
-To download a Windows binary of sym, please see the 
-[releases page](https://github.com/pjwilcoxen/sym/releases).
+
+## G-Cubed and Sym
+
+The equations for G-Cubed model definitions are also expressed in Sym and 
+this fork of the Sym processor supports generation of both Ox and Python 
+files from a Sym model definition.
+
+## G-Cubed HTML model documentation
+
+This fork of Sym also supports creation of an HTML page documenting 
+the parameters, variables and equations in a Sym model definition.
+
+## Make files
+
+To build the Sym processor a make file is available for both the Windows
+platform and the MacOS platform.
+
+If you are building the Sym processor on Windows, you will need to replace
+the `/src/makefile` with the `/src/windows_makefile`.
+

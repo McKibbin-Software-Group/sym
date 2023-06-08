@@ -383,8 +383,8 @@ void HTML_begin_file(char *basename)
    fprintf(code, "<html>\n<head>\n");
    fprintf(code, "<title>G-Cubed %s</title>\n", basename);
    fprintf(code, "<link rel='stylesheet' href='https://documentation.gcubed.com/assets/css/just-the-docs-default.css'/>");
-   fprintf(code, "<script src='https://documentation.gcubed.com//assets/js/vendor/lunr.min.js'></script>");
-   fprintf(code, "<script src='https://documentation.gcubed.com//assets/js/just-the-docs.js'></script>");
+   fprintf(code, "<script src='https://documentation.gcubed.com/assets/js/vendor/lunr.min.js'></script>");
+   fprintf(code, "<script src='https://documentation.gcubed.com/assets/js/just-the-docs.js'></script>");
    fprintf(code, "<style type='text/css'>\n%s</style>\n", HTML_css);
    fprintf(code, "<script>MathJax = { jax: ['input/tex', 'output/svg'], tex: { tags: 'ams', packages: {'[+]': ['textmacros']} }, svg: { displayAlign: 'left' }, loader: {load: ['[tex]/textmacros']} };</script>");
    fprintf(code, "<script type='text/javascript' id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js'></script>\n");

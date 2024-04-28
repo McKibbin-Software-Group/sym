@@ -3,8 +3,8 @@
 #
 
 #TAR=watcom
-#TAR=gcc
-TAR=mingw_32
+TAR=gcc
+#TAR=mingw_32
 #TAR=mingw_64
 
 #  To set a default target, add a line with TAR=target to 
@@ -18,7 +18,7 @@ TAR=mingw_32
 #
 
 OBJ  = o
-EXE  = sym.exe
+EXE  = sym
 EOPT = -o $(EXE)
 OPT  = -g
 # Geoff Shuetrim 2022-11-22 Added YACC so we can use byacc or yacc.
@@ -101,7 +101,8 @@ lang/%.o : lang/%.c
 
 #all : ../docs/usage.md ../docs/syntax.md
 #
-#../docs/syntax.md : $(EXE)#
+#../docs/syntax.md : $(EXE)
+#
 #	-rm -f $@
 #	$(EXE) -syntax > $@
 #

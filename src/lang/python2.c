@@ -234,7 +234,7 @@ static char *setname_goods = "goods";
 //  syntax in the sym file.
 //
 
-static char *USA_CODE = "USA";
+static char *USA_CODE = "UU";
 
 //
 //  Rules for translating between new and old notation in the

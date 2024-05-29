@@ -859,6 +859,7 @@ void PYTHON_begin_file(char *basename)
    vecname[X1R] = "x1r";
    vecname[UNK] = "";
 
+   fprintf(code, "import logging\n");
    fprintf(code, "import numpy as np\n");
    fprintf(code, "from math import exp\n");
    fprintf(code, "from math import log\n");
